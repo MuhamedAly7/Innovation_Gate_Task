@@ -27,7 +27,7 @@ class AuthService
             if (!$token = Auth::attempt($credentials)) {
                 return ['status' => 'error', 'message' => 'Invalid Credentials', 'code' => 401];
             }
-            $user = $this->userRepository->invalidateToken($token);
+            $user = $this->userRepository->getAuthUser();
         } catch (JWTException $e) {
             return ['status' => 'error', 'message' => 'Could not create token', 'code' => 401];
         }

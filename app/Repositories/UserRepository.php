@@ -18,22 +18,9 @@ class UserRepository
         $user->save();
     }
 
-    public function invalidateToken(string $token)
+    public function getAuthUser()
     {
         $user = auth()->user();
-
-        // Invalidate old token if exists
-        if (!empty($user->current_token)) {
-            try {
-                JWTAuth::setToken($user->current_token)->invalidate();
-            } catch (Exception $e) {
-                // ignore invalid/expired tokens
-            }
-        }
-
-        $user->current_token = $token;
-        $user->save();
-
         return $user;
     }
 

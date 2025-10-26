@@ -20,7 +20,7 @@ type TaskStatus = "all" | "done" | "missed" | "today" | "upcoming";
 type SortOrder = "asc" | "desc";
 
 const TasksPage: React.FC = () => {
-    const [error, setError] = useState("");
+    const [, setError] = useState<string>("");
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedTaskForAssign, setSelectedTaskForAssign] =
@@ -35,7 +35,6 @@ const TasksPage: React.FC = () => {
 
     const {
         data: tasksData,
-        isLoading,
         error: tasksError,
     } = useQuery<{ data: { tasks: Task[] } }>({
         queryKey: ["tasks"],
