@@ -297,7 +297,9 @@ const TasksPage: React.FC = () => {
                             {canModifyTask(task) && (
                                 <>
                                     <button
-                                        onClick={() => toggleMutation.mutate(task.id)}
+                                        onClick={() =>
+                                            toggleMutation.mutate(task.id)
+                                        }
                                         className={`px-2 py-1 rounded text-sm ${
                                             task.is_completed
                                                 ? "bg-yellow-500 hover:bg-yellow-600"
