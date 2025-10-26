@@ -61,6 +61,24 @@
     http://localhost:8080
     ```
     
+11. Go to frontend folder
+    ```bash
+    cd frontend
+    ```
+12. Install Node.js dependencies:
+    ```bash
+    npm install
+    ```
+13. Start the frontend development server:
+    ```bash
+    npm run dev
+    ```
+
+14. Open your browser and navigate to:
+    ```
+    http://localhost:3000
+    ```
+    
 
 # Task Management API Documentation
 
