@@ -283,12 +283,21 @@ const TasksPage: React.FC = () => {
                             </p>
                         </div>
                         <div className="flex flex-wrap gap-2">
+                            {/* Show Assign button only if user is creator */}
+                            {task.creator_id === authenticatedUser.id && (
+                                <button
+                                    onClick={() => handleAssign(task)}
+                                    className="bg-purple-500 text-white px-2 py-1 rounded text-sm hover:bg-purple-600"
+                                >
+                                    Assign
+                                </button>
+                            )}
+
+                            {/* Show other buttons if user can modify */}
                             {canModifyTask(task) && (
                                 <>
                                     <button
-                                        onClick={() =>
-                                            toggleMutation.mutate(task.id)
-                                        }
+                                        onClick={() => toggleMutation.mutate(task.id)}
                                         className={`px-2 py-1 rounded text-sm ${
                                             task.is_completed
                                                 ? "bg-yellow-500 hover:bg-yellow-600"
