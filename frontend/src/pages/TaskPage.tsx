@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { format, isBefore, isToday, parseISO } from "date-fns";
+import { isBefore, isToday, parseISO } from "date-fns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     getTasks,
@@ -15,6 +15,9 @@ import { Navigate, useNavigate } from "react-router-dom";
 import EditTaskModal from "../components/tasks/EditTaskModal";
 import AssignTaskModal from "../components/tasks/AssignTaskModal";
 import DeleteConfirmationModal from "../components/tasks/DeleteConfirmationModal";
+import TaskFilter from "../components/tasks/TaskFilter";
+import TaskCard from "../components/tasks/TaskCard";
+import TaskHeader from "../components/tasks/TaskHeader";
 
 type TaskStatus = "all" | "done" | "missed" | "today" | "upcoming";
 type SortOrder = "asc" | "desc";
@@ -184,172 +187,34 @@ const TasksPage: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <p className="text-blue-800">
-                    Welcome back,{" "}
-                    <span className="font-semibold">
-                        {authenticatedUser.name}
-                    </span>
-                    ! Here are your tasks.
-                </p>
-            </div>
+            <TaskHeader
+                userName={authenticatedUser.name}
+                onCreateTask={() => navigate("/tasks/create")}
+                onLogout={handleLogout}
+            />
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h1 className="text-2xl sm:text-3xl font-bold">My Tasks</h1>
-                <div className="flex flex-wrap gap-2">
-                    <button
-                        onClick={() => navigate("/tasks/create")}
-                        className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 text-sm sm:text-base"
-                    >
-                        Create Task
-                    </button>
-                    <button
-                        onClick={handleLogout}
-                        className="bg-red-500 text-white px-3 py-2 rounded hover:bg-red-600 text-sm sm:text-base"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
+            <TaskFilter
+                statusFilter={statusFilter}
+                priorityFilter={priorityFilter}
+                sortOrder={sortOrder}
+                onStatusChange={setStatusFilter}
+                onPriorityChange={setPriorityFilter}
+                onSortChange={setSortOrder}
+            />
 
-            {/* Filters */}
-            <div className="bg-white p-4 sm:p-6 rounded shadow-md mb-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Status
-                        </label>
-                        <select
-                            value={statusFilter}
-                            onChange={(e) =>
-                                setStatusFilter(e.target.value as TaskStatus)
-                            }
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="all">All Status</option>
-                            <option value="done">Done</option>
-                            <option value="missed">Missed/Late</option>
-                            <option value="today">Due Today</option>
-                            <option value="upcoming">Upcoming</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Priority
-                        </label>
-                        <select
-                            value={priorityFilter}
-                            onChange={(e) => setPriorityFilter(e.target.value)}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="all">All Priorities</option>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1">
-                            Sort by Due Date
-                        </label>
-                        <select
-                            value={sortOrder}
-                            onChange={(e) =>
-                                setSortOrder(e.target.value as SortOrder)
-                            }
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="asc">Ascending</option>
-                            <option value="desc">Descending</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            {/* Tasks List */}
             <div className="bg-white p-4 sm:p-6 rounded shadow-md">
                 {filteredAndSortedTasks?.map((task) => (
-                    <div
+                    <TaskCard
                         key={task.id}
-                        className="border-b p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                    >
-                        <div className="space-y-2 flex-1">
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-bold">{task.title}</h3>
-                                <span
-                                    className={`px-2 py-0.5 text-xs rounded-full ${
-                                        getTaskStatus(task) === "done"
-                                            ? "bg-green-100 text-green-800"
-                                            : getTaskStatus(task) === "missed"
-                                            ? "bg-red-100 text-red-800"
-                                            : getTaskStatus(task) === "today"
-                                            ? "bg-yellow-100 text-yellow-800"
-                                            : "bg-blue-100 text-blue-800"
-                                    }`}
-                                >
-                                    {getTaskStatus(task)
-                                        .charAt(0)
-                                        .toUpperCase() +
-                                        getTaskStatus(task).slice(1)}
-                                </span>
-                            </div>
-                            <p className="text-sm text-gray-600">
-                                Priority: {task.priority}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                                Due:{" "}
-                                {task.due_date
-                                    ? format(
-                                          parseISO(task.due_date),
-                                          "MMM dd, yyyy"
-                                      )
-                                    : "No date set"}
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            {/* Show Assign button only if user is creator */}
-                            {task.creator_id === authenticatedUser.id && (
-                                <button
-                                    onClick={() => handleAssign(task)}
-                                    className="bg-purple-500 text-white px-2 py-1 rounded text-sm hover:bg-purple-600"
-                                >
-                                    Assign
-                                </button>
-                            )}
-
-                            {/* Show other buttons if user can modify */}
-                            {canModifyTask(task) && (
-                                <>
-                                    <button
-                                        onClick={() =>
-                                            toggleMutation.mutate(task.id)
-                                        }
-                                        className={`px-2 py-1 rounded text-sm ${
-                                            task.is_completed
-                                                ? "bg-yellow-500 hover:bg-yellow-600"
-                                                : "bg-green-500 hover:bg-green-600"
-                                        } text-white`}
-                                    >
-                                        {task.is_completed
-                                            ? "Mark Pending"
-                                            : "Mark Complete"}
-                                    </button>
-                                    <button
-                                        onClick={() => handleEdit(task)}
-                                        className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(task)}
-                                        className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
+                        task={task}
+                        status={getTaskStatus(task)}
+                        authenticatedUser={authenticatedUser}
+                        onAssign={handleAssign}
+                        onToggle={(id) => toggleMutation.mutate(id)}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        canModifyTask={canModifyTask}
+                    />
                 ))}
                 {filteredAndSortedTasks?.length === 0 && (
                     <p className="text-gray-500 text-center py-4">

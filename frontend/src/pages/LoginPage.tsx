@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../services/api";
 import type { ApiResponse, User } from "../types";
 import { useQueryClient } from "@tanstack/react-query";
+import AuthLayout from "../auth/components/AuthLayout";
+import Button from "../common/components/Button";
+import FormInput from "../common/components/FormInput";
 
 const LoginPage: React.FC = () => {
     const [email, setEmail] = useState("");
@@ -52,66 +55,39 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
-            <div className="bg-white p-6 sm:p-8 rounded shadow-md w-full max-w-md">
-                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">
+        <AuthLayout title="Login" error={error}>
+            <form onSubmit={handleSubmit}>
+                <FormInput
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    error={fieldErrors.email?.[0]}
+                    required
+                />
+                <FormInput
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    error={fieldErrors.password?.[0]}
+                    required
+                />
+                <Button
+                    type="submit"
+                    isLoading={mutation.isPending}
+                    className="w-full"
+                >
                     Login
-                </h2>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 border rounded"
-                            required
-                        />
-                        {fieldErrors.email && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.email[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 border rounded"
-                            required
-                        />
-                        {fieldErrors.password && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.password[0]}
-                            </p>
-                        )}
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                        disabled={mutation.isPending}
-                    >
-                        {mutation.isPending ? "Logging in..." : "Login"}
-                    </button>
-                </form>
-                <p className="mt-4 text-center">
-                    Don't have an account?{" "}
-                    <Link
-                        to="/register"
-                        className="text-blue-500 hover:underline"
-                    >
-                        Register
-                    </Link>
-                </p>
-            </div>
-        </div>
+                </Button>
+            </form>
+            <p className="mt-4 text-center">
+                Don't have an account?{" "}
+                <Link to="/register" className="text-blue-500 hover:underline">
+                    Register
+                </Link>
+            </p>
+        </AuthLayout>
     );
 };
 

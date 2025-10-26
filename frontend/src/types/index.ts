@@ -29,3 +29,6 @@ export interface LoginResponse {
     token: string;
     user: User;
 }
+
+export type TaskStatus = "all" | "done" | "missed" | "today" | "upcoming";
+export type SortOrder = "asc" | "desc";

@@ -1,8 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { register } from "../services/api";
+import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { register } from "../services/api";
 import type { ApiResponse } from "../types";
+import AuthLayout from "../auth/components/AuthLayout";
+import Button from "../common/components/Button";
+import FormInput from "../common/components/FormInput";
 
 const RegisterPage: React.FC = () => {
     const [name, setName] = useState("");
@@ -32,7 +35,6 @@ const RegisterPage: React.FC = () => {
             }
         },
         onError: (error: any) => {
-            // Handle axios error response
             if (error.response?.data) {
                 const responseData = error.response.data;
                 setError(responseData.message || "Registration failed");
@@ -58,109 +60,55 @@ const RegisterPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6">
-            <div className="bg-white p-6 sm:p-8 rounded shadow-md w-full max-w-md">
-                <h2 className="text-xl sm:text-2xl font-bold mb-6 text-center">
+        <AuthLayout title="Register" error={error}>
+            <form onSubmit={handleSubmit}>
+                <FormInput
+                    label="Name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    error={fieldErrors.name?.[0]}
+                    required
+                />
+                <FormInput
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    error={fieldErrors.email?.[0]}
+                    required
+                />
+                <FormInput
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    error={fieldErrors.password?.[0]}
+                    required
+                />
+                <FormInput
+                    label="Confirm Password"
+                    type="password"
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    error={fieldErrors.password_confirmation?.[0]}
+                    required
+                />
+                <Button
+                    type="submit"
+                    isLoading={mutation.isPending}
+                    className="w-full"
+                >
                     Register
-                </h2>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className={`w-full p-2 border rounded ${
-                                fieldErrors.name ? "border-red-500" : ""
-                            }`}
-                            required
-                        />
-                        {fieldErrors.name && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.name[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full p-2 border rounded ${
-                                fieldErrors.email ? "border-red-500" : ""
-                            }`}
-                            required
-                        />
-                        {fieldErrors.email && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.email[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={`w-full p-2 border rounded ${
-                                fieldErrors.password ? "border-red-500" : ""
-                            }`}
-                            required
-                        />
-                        {fieldErrors.password && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.password[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Confirm Password
-                        </label>
-                        <input
-                            type="password"
-                            value={passwordConfirmation}
-                            onChange={(e) =>
-                                setPasswordConfirmation(e.target.value)
-                            }
-                            className={`w-full p-2 border rounded ${
-                                fieldErrors.password_confirmation
-                                    ? "border-red-500"
-                                    : ""
-                            }`}
-                            required
-                        />
-                        {fieldErrors.password_confirmation && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.password_confirmation[0]}
-                            </p>
-                        )}
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                        disabled={mutation.isPending}
-                    >
-                        {mutation.isPending ? "Registering..." : "Register"}
-                    </button>
-                </form>
-                <p className="mt-4 text-center">
-                    Already have an account?{" "}
-                    <Link to="/login" className="text-blue-500 hover:underline">
-                        Login
-                    </Link>
-                </p>
-            </div>
-        </div>
+                </Button>
+            </form>
+            <p className="mt-4 text-center">
+                Already have an account?{" "}
+                <Link to="/login" className="text-blue-500 hover:underline">
+                    Login
+                </Link>
+            </p>
+        </AuthLayout>
     );
 };
 

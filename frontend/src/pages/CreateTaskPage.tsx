@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createTask, getUsers } from "../services/api";
 import type { User } from "../types";
 import { useNavigate } from "react-router-dom";
+import FormField from "../common/components/FormField";
+import FormInput from "../common/components/FormInput";
 
 const CreateTaskPage: React.FC = () => {
     const [title, setTitle] = useState("");
@@ -77,48 +79,27 @@ const CreateTaskPage: React.FC = () => {
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleCreate} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Title
-                            </label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className={`w-full p-2 border rounded ${
-                                    fieldErrors.title ? "border-red-500" : ""
-                                }`}
-                                required
-                            />
-                            {fieldErrors.title && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {fieldErrors.title[0]}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Due Date
-                            </label>
-                            <input
-                                type="date"
-                                value={dueDate}
-                                onChange={(e) => setDueDate(e.target.value)}
-                                className={`w-full p-2 border rounded ${
-                                    fieldErrors.due_date ? "border-red-500" : ""
-                                }`}
-                            />
-                            {fieldErrors.due_date && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {fieldErrors.due_date[0]}
-                                </p>
-                            )}
-                        </div>
+                        <FormInput
+                            label="Title"
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            error={fieldErrors.title?.[0]}
+                            required
+                        />
+                        <FormInput
+                            label="Due Date"
+                            type="date"
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                            error={fieldErrors.due_date?.[0]}
+                        />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Description
-                        </label>
+
+                    <FormField
+                        label="Description"
+                        error={fieldErrors.description?.[0]}
+                    >
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -126,16 +107,12 @@ const CreateTaskPage: React.FC = () => {
                                 fieldErrors.description ? "border-red-500" : ""
                             }`}
                         />
-                        {fieldErrors.description && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.description[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Priority
-                        </label>
+                    </FormField>
+
+                    <FormField
+                        label="Priority"
+                        error={fieldErrors.priority?.[0]}
+                    >
                         <select
                             value={priority}
                             onChange={(e) =>
@@ -151,16 +128,12 @@ const CreateTaskPage: React.FC = () => {
                             <option value="medium">Medium</option>
                             <option value="high">High</option>
                         </select>
-                        {fieldErrors.priority && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.priority[0]}
-                            </p>
-                        )}
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">
-                            Assignee
-                        </label>
+                    </FormField>
+
+                    <FormField
+                        label="Assignee"
+                        error={fieldErrors.assignee_email?.[0]}
+                    >
                         <select
                             value={assigneeEmail}
                             onChange={(e) => setAssigneeEmail(e.target.value)}
@@ -178,12 +151,8 @@ const CreateTaskPage: React.FC = () => {
                                 </option>
                             ))}
                         </select>
-                        {fieldErrors.assignee_email && (
-                            <p className="text-red-500 text-sm mt-1">
-                                {fieldErrors.assignee_email[0]}
-                            </p>
-                        )}
-                    </div>
+                    </FormField>
+
                     <button
                         type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
