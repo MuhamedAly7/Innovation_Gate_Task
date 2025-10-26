@@ -11,7 +11,7 @@ import {
     logout,
 } from "../services/api";
 import type { Task, User } from "../types";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import EditTaskModal from "../components/tasks/EditTaskModal";
 import AssignTaskModal from "../components/tasks/AssignTaskModal";
 import DeleteConfirmationModal from "../components/tasks/DeleteConfirmationModal";
@@ -33,10 +33,9 @@ const TasksPage: React.FC = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    const {
-        data: tasksData,
-        error: tasksError,
-    } = useQuery<{ data: { tasks: Task[] } }>({
+    const { data: tasksData, error: tasksError } = useQuery<{
+        data: { tasks: Task[] };
+    }>({
         queryKey: ["tasks"],
         queryFn: getTasks,
         // Only fetch if we have a token
@@ -173,11 +172,14 @@ const TasksPage: React.FC = () => {
     };
 
     if (tasksError) {
-        return (
-            <div className="text-red-500">
-                Error loading tasks: {tasksError.message}
-            </div>
-        );
+        // return (
+        //     <div className="text-red-500">
+        //         Error loading tasks: {tasksError.message}
+        //     </div>
+
+        // );
+        localStorage.removeItem("token");
+        <Navigate to={"/login"} />;
     }
 
     return (

@@ -13,6 +13,7 @@ const CreateTaskPage: React.FC = () => {
     );
     const [assigneeEmail, setAssigneeEmail] = useState("");
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -27,8 +28,18 @@ const CreateTaskPage: React.FC = () => {
             if (data.status === "success") {
                 queryClient.invalidateQueries({ queryKey: ["tasks"] });
                 navigate("/tasks");
+            }
+        },
+        onError: (error: any) => {
+            // Handle axios error response
+            if (error.response?.data) {
+                const responseData = error.response.data;
+                setError(responseData.message || "Task creation failed");
+                if (responseData.data) {
+                    setFieldErrors(responseData.data);
+                }
             } else {
-                setError(data.message);
+                setError("An error occurred");
             }
         },
     });
@@ -36,6 +47,7 @@ const CreateTaskPage: React.FC = () => {
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setFieldErrors({});
         createMutation.mutate({
             title,
             description,
@@ -71,9 +83,16 @@ const CreateTaskPage: React.FC = () => {
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full p-2 border rounded"
+                                className={`w-full p-2 border rounded ${
+                                    fieldErrors.title ? "border-red-500" : ""
+                                }`}
                                 required
                             />
+                            {fieldErrors.title && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {fieldErrors.title[0]}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-1">
@@ -83,8 +102,15 @@ const CreateTaskPage: React.FC = () => {
                                 type="date"
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
-                                className="w-full p-2 border rounded"
+                                className={`w-full p-2 border rounded ${
+                                    fieldErrors.due_date ? "border-red-500" : ""
+                                }`}
                             />
+                            {fieldErrors.due_date && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {fieldErrors.due_date[0]}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <div className="mb-4">
@@ -94,8 +120,15 @@ const CreateTaskPage: React.FC = () => {
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.description ? "border-red-500" : ""
+                            }`}
                         />
+                        {fieldErrors.description && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.description[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -108,12 +141,19 @@ const CreateTaskPage: React.FC = () => {
                                     e.target.value as "low" | "medium" | "high"
                                 )
                             }
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.priority ? "border-red-500" : ""
+                            }`}
                         >
                             <option value="low">Low</option>
                             <option value="medium">Medium</option>
                             <option value="high">High</option>
                         </select>
+                        {fieldErrors.priority && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.priority[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -122,7 +162,9 @@ const CreateTaskPage: React.FC = () => {
                         <select
                             value={assigneeEmail}
                             onChange={(e) => setAssigneeEmail(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.assignee_email ? "border-red-500" : ""
+                            }`}
                             required
                         >
                             <option value="">Select Assignee</option>
@@ -132,15 +174,18 @@ const CreateTaskPage: React.FC = () => {
                                 </option>
                             ))}
                         </select>
+                        {fieldErrors.assignee_email && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.assignee_email[0]}
+                            </p>
+                        )}
                     </div>
                     <button
                         type="submit"
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         disabled={createMutation.isPending}
                     >
-                        {createMutation.isPending
-                            ? "Creating..."
-                            : "Create Task"}
+                        {createMutation.isPending ? "Creating..." : "Create Task"}
                     </button>
                 </form>
             </div>

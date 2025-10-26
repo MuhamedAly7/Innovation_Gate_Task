@@ -32,7 +32,6 @@ export const login = async (data: {
     const response = await api.post("/login", data);
     if (response.data.status === "success") {
         localStorage.setItem("token", response.data.data.token);
-        // Store user data if needed
         localStorage.setItem("user", JSON.stringify(response.data.data.user));
     }
     return response.data;

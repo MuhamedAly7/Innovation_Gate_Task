@@ -10,23 +10,45 @@ const RegisterPage: React.FC = () => {
     const [password, setPassword] = useState("");
     const [passwordConfirmation, setPasswordConfirmation] = useState("");
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
+        {}
+    );
     const navigate = useNavigate();
 
-    const mutation = useMutation<ApiResponse<any>, Error, any>({
+    const mutation = useMutation<
+        ApiResponse<null>,
+        any,
+        {
+            name: string;
+            email: string;
+            password: string;
+            password_confirmation: string;
+        }
+    >({
         mutationFn: register,
         onSuccess: (data) => {
             if (data.status === "success") {
                 navigate("/login");
-            } else {
-                setError(data.message);
             }
         },
-        onError: () => setError("An error occurred"),
+        onError: (error: any) => {
+            // Handle axios error response
+            if (error.response?.data) {
+                const responseData = error.response.data;
+                setError(responseData.message || "Registration failed");
+                if (responseData.data) {
+                    setFieldErrors(responseData.data);
+                }
+            } else {
+                setError("An error occurred");
+            }
+        },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setFieldErrors({});
         mutation.mutate({
             name,
             email,
@@ -51,9 +73,16 @@ const RegisterPage: React.FC = () => {
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.name ? "border-red-500" : ""
+                            }`}
                             required
                         />
+                        {fieldErrors.name && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.name[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -63,9 +92,16 @@ const RegisterPage: React.FC = () => {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.email ? "border-red-500" : ""
+                            }`}
                             required
                         />
+                        {fieldErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.email[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -75,9 +111,16 @@ const RegisterPage: React.FC = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.password ? "border-red-500" : ""
+                            }`}
                             required
                         />
+                        {fieldErrors.password && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.password[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -89,9 +132,18 @@ const RegisterPage: React.FC = () => {
                             onChange={(e) =>
                                 setPasswordConfirmation(e.target.value)
                             }
-                            className="w-full p-2 border rounded"
+                            className={`w-full p-2 border rounded ${
+                                fieldErrors.password_confirmation
+                                    ? "border-red-500"
+                                    : ""
+                            }`}
                             required
                         />
+                        {fieldErrors.password_confirmation && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.password_confirmation[0]}
+                            </p>
+                        )}
                     </div>
                     <button
                         type="submit"

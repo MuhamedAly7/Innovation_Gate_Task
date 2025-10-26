@@ -1,3 +1,67 @@
+# How to prepare your local setup
+
+## Prerequisites
+- Docker
+- Node.js
+
+1. **Clone the Repository**:
+   ```bash
+   git clone git@github.com:MuhamedAly7/Innovation_Gate_Task.git
+   cd Innovation_Gate_Task
+   ```
+
+2. **Set Up Environment Variables**:
+    Copy the example environment file and modify it as needed:
+    ```bash
+    cp .env.example .env
+    ```
+3. Update the `.env` file 
+    ```bash
+    DB_CONNECTION=mysql
+    DB_HOST=laravel_mysql
+    DB_PORT=3306
+    DB_DATABASE=laravel
+    DB_USERNAME=root
+    DB_PASSWORD=root
+    ```
+   
+4. **Build and Start Docker Containers**:
+   ```bash
+   docker compose up -d --build
+   ```
+   
+5. **Install Composer Dependencies**:
+   ```bash
+   docker compose exec app composer install
+   ```
+   
+6. **Generate Application Key**:
+   ```bash
+   docker compose exec app php artisan key:generate
+   ```
+   
+7. **Run Migrations**:
+   ```bash
+   docker compose exec app php artisan migrate
+   ```
+   
+8. **Install Node.js Dependencies and Build Assets**:
+   ```bash
+   docker compose exec app php artisan jwt:secret
+   ```
+   
+9. ** Add those line to .env file**
+   ```bash
+   JWT_SECRETJWT_TTL=60
+    JWT_BLACKLIST_ENABLED=true
+   ```
+
+10. Test the application by opening the browser and navigating to:
+    ```
+    http://localhost:8080
+    ```
+    
+
 # Task Management API Documentation
 
 This document outlines the API endpoints for the Task Management System built with Laravel 12.35.1 and PHP 8.3.26. The API uses JWT (JSON Web Token) for authentication and follows a RESTful structure. All endpoints are prefixed with /api (e.g., `http://localhost:8080/api/`).

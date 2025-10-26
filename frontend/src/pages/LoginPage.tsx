@@ -9,6 +9,9 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
+        {}
+    );
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -28,7 +31,18 @@ const LoginPage: React.FC = () => {
                 setError(data.message);
             }
         },
-        onError: () => setError("An error occurred"),
+        onError: (error: any) => {
+            // Handle axios error response
+            if (error.response?.data) {
+                const responseData = error.response.data;
+                setError(responseData.message || "Login failed");
+                if (responseData.data) {
+                    setFieldErrors(responseData.data);
+                }
+            } else {
+                setError("An error occurred");
+            }
+        },
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -56,6 +70,11 @@ const LoginPage: React.FC = () => {
                             className="w-full p-2 border rounded"
                             required
                         />
+                        {fieldErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.email[0]}
+                            </p>
+                        )}
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium mb-1">
@@ -68,6 +87,11 @@ const LoginPage: React.FC = () => {
                             className="w-full p-2 border rounded"
                             required
                         />
+                        {fieldErrors.password && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {fieldErrors.password[0]}
+                            </p>
+                        )}
                     </div>
                     <button
                         type="submit"
