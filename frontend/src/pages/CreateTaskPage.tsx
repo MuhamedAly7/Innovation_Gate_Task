@@ -13,7 +13,9 @@ const CreateTaskPage: React.FC = () => {
     );
     const [assigneeEmail, setAssigneeEmail] = useState("");
     const [error, setError] = useState("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>(
+        {}
+    );
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -163,7 +165,9 @@ const CreateTaskPage: React.FC = () => {
                             value={assigneeEmail}
                             onChange={(e) => setAssigneeEmail(e.target.value)}
                             className={`w-full p-2 border rounded ${
-                                fieldErrors.assignee_email ? "border-red-500" : ""
+                                fieldErrors.assignee_email
+                                    ? "border-red-500"
+                                    : ""
                             }`}
                             required
                         >
@@ -185,7 +189,9 @@ const CreateTaskPage: React.FC = () => {
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         disabled={createMutation.isPending}
                     >
-                        {createMutation.isPending ? "Creating..." : "Create Task"}
+                        {createMutation.isPending
+                            ? "Creating..."
+                            : "Create Task"}
                     </button>
                 </form>
             </div>
