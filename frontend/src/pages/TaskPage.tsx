@@ -14,6 +14,7 @@ import type { Task, User } from "../types";
 import { useNavigate } from "react-router-dom";
 import EditTaskModal from "../components/tasks/EditTaskModal";
 import AssignTaskModal from "../components/tasks/AssignTaskModal";
+import DeleteConfirmationModal from "../components/tasks/DeleteConfirmationModal";
 
 type TaskStatus = "all" | "done" | "missed" | "today" | "upcoming";
 type SortOrder = "asc" | "desc";
@@ -28,6 +29,7 @@ const TasksPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState<TaskStatus>("all");
     const [priorityFilter, setPriorityFilter] = useState<string>("all");
     const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+    const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -116,6 +118,17 @@ const TasksPage: React.FC = () => {
 
     const handleAssignSubmit = (id: number, email: string) => {
         assignMutation.mutate({ id, email });
+    };
+
+    const handleDelete = (task: Task) => {
+        setTaskToDelete(task);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (taskToDelete) {
+            deleteMutation.mutate(taskToDelete.id);
+            setTaskToDelete(null);
+        }
     };
 
     // Get the authenticated user from localStorage
@@ -317,10 +330,7 @@ const TasksPage: React.FC = () => {
                                         Edit
                                     </button>
                                     <button
-                                        onClick={() => {
-                                            if (confirm("Delete this task?"))
-                                                deleteMutation.mutate(task.id);
-                                        }}
+                                        onClick={() => handleDelete(task)}
                                         className="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600"
                                     >
                                         Delete
@@ -361,6 +371,16 @@ const TasksPage: React.FC = () => {
                         setSelectedTaskForAssign(null);
                     }}
                     onSubmit={handleAssignSubmit}
+                />
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {taskToDelete && (
+                <DeleteConfirmationModal
+                    isOpen={!!taskToDelete}
+                    onClose={() => setTaskToDelete(null)}
+                    onConfirm={handleDeleteConfirm}
+                    taskTitle={taskToDelete.title}
                 />
             )}
         </div>
